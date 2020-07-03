@@ -1,0 +1,29 @@
+---
+title: "Leaflet-Demo"
+author: "Mehran Behzad"
+date: "3 7 2020"
+output: html_document
+---
+
+## Load Leaflet
+
+
+```{r, results="hide", message=FALSE}
+# install.packages("leaflet")
+library(leaflet)
+library(dplyr)
+
+```
+
+## Render Map
+
+A simple leaflet map
+
+```{r}
+m <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng=174.768, lat=-36.852, popup="The birthplace of R")
+m  # Print the map
+```
+
+
