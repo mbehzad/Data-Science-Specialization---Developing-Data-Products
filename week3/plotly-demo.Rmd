@@ -1,0 +1,40 @@
+---
+title: "Plotly-Demo"
+author: "Mehran Behzad"
+date: "5 7 2020"
+output: html_document
+---
+
+## load plotly library
+
+```{r, results="hide", message=FALSE}
+library(plotly)
+library(dplyr)
+```
+
+## plot
+
+add some data and plot
+
+```{r}
+
+
+df <- data.frame(
+  x = c(1,2,1), 
+  y = c(1,2,1), 
+  f = c(1,2,3)
+)
+
+fig <- df %>%
+  plot_ly(
+    x = ~x,
+    y = ~y,
+    frame = ~f,
+    type = 'scatter',
+    mode = 'markers',
+    showlegend = F
+  )
+
+fig
+
+```
