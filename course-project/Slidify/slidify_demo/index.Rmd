@@ -1,0 +1,85 @@
+---
+title       : shiny app to visualize training accuracy 
+subtitle    : Developing Data Products a slidify demo
+author      : Mehran Behzad
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+---
+
+
+## Intro
+There are many different training models which have different accuracies.
+Now assume we have some data which we will be using to train our model. And test which one has a better result.
+
+--- .class #id
+## Setup
+We will be using the Iris data-set and some caret training methods.
+First the data is split in training and testing set, we will be using the training set to train our model and test it's prediction abilities on the remaining test set.
+
+```{r echo = T, results = 'hide'}
+data(iris)
+library(ggplot2)
+library(caret)
+library(dplyr)
+set.seed(123)
+
+```
+
+
+```{r echo = T, results = 'hide'}
+inTrain <- createDataPartition(y=iris$Species, 
+                               p=0.5, list=FALSE)
+training <- iris[inTrain,]
+testing <- iris[-inTrain,]
+
+```
+
+--- .class #id
+## Training
+Now the training:
+
+```{r echo = T, results = 'hide'}
+mod = train(Species ~ .,data=training,method="rf")
+p = predict(mod,testing);
+
+```
+
+## Results
+We could look at the ourput results in the form of
+
+```{r}
+table(testing$Species, p)
+```
+
+
+--- .class #id
+## Plotting
+
+But what if we had a visualization tool which not only shows us this information. But also allows us to see which region were the misidentifications.
+
+We introduce our super duper shiny app which generates this plot for each training method that we choose:
+
+
+```{r echo = T, results = 'hide'}
+correctPredictions = (p==testing$Species)
+# mark misidentified
+testing$correctPredicted <- correctPredictions
+dplyr::filter(testing, correctPredicted == FALSE)
+# the data
+plot1 <- qplot(Petal.Width, Sepal.Width, colour=Species, data=testing)
+# the misidentified
+plot1 <- plot1 + geom_point(data = dplyr::filter(testing, correctPredicted == FALSE),
+                            shape = 21, colour = "red", size = 5, stroke = 1)
+```
+
+--- .class #id
+## The Plot
+Ta-dah!
+
+```{r echo = F}
+plot1
+```

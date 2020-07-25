@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>shiny app to visualize training accuracy</title>
+  <meta charset="utf-8">
+  <meta name="description" content="shiny app to visualize training accuracy">
+  <meta name="author" content="Mehran Behzad">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  
+  <hgroup class="auto-fadein">
+    <h1>shiny app to visualize training accuracy</h1>
+    <h2>Developing Data Products a slidify demo</h2>
+    <p>Mehran Behzad<br/></p>
+  </hgroup>
+  
+  <article></article>  
+  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  
+  <hgroup>
+    <h2>Intro</h2>
+  </hgroup>
+  
+  <article data-timings="">
+    <p>There are many different training models which have different accuracies.
+Now assume we have some data which we will be using to train our model. And test which one has a better result.</p>
+
+  </article>
+  <!-- Presenter Notes -->
+  
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  
+  <hgroup>
+    <h2>Setup</h2>
+  </hgroup>
+  
+  <article data-timings="">
+    <p>We will be using the Iris data-set and some caret training methods.
+First the data is split in training and testing set, we will be using the training set to train our model and test it&#39;s prediction abilities on the remaining test set.</p>
+
+<pre><code class="r">data(iris)
+library(ggplot2)
+library(caret)
+library(dplyr)
+set.seed(123)
+</code></pre>
+
+<pre><code class="r">inTrain &lt;- createDataPartition(y=iris$Species, 
+                               p=0.5, list=FALSE)
+training &lt;- iris[inTrain,]
+testing &lt;- iris[-inTrain,]
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+  
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  
+  <hgroup>
+    <h2>Training</h2>
+  </hgroup>
+  
+  <article data-timings="">
+    <p>Now the training:</p>
+
+<pre><code class="r">mod = train(Species ~ .,data=training,method=&quot;rf&quot;)
+p = predict(mod,testing);
+</code></pre>
+
+<h2>Results</h2>
+
+<p>We could look at the ourput results in the form of</p>
+
+<pre><code class="r">table(testing$Species, p)
+</code></pre>
+
+<pre><code>##             p
+##              setosa versicolor virginica
+##   setosa         25          0         0
+##   versicolor      0         22         3
+##   virginica       0          2        23
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+  
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  
+  <hgroup>
+    <h2>Plotting</h2>
+  </hgroup>
+  
+  <article data-timings="">
+    <p>But what if we had a visualization tool which not only shows us this information. But also allows us to see which region were the misidentifications.</p>
+
+<p>We introduce our super duper shiny app which generates this plot for each training method that we choose:</p>
+
+<pre><code class="r">correctPredictions = (p==testing$Species)
+# mark misidentified
+testing$correctPredicted &lt;- correctPredictions
+dplyr::filter(testing, correctPredicted == FALSE)
+# the data
+plot1 &lt;- qplot(Petal.Width, Sepal.Width, colour=Species, data=testing)
+# the misidentified
+plot1 &lt;- plot1 + geom_point(data = dplyr::filter(testing, correctPredicted == FALSE),
+                            shape = 21, colour = &quot;red&quot;, size = 5, stroke = 1)
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+  
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  
+  <hgroup>
+    <h2>The Plot</h2>
+  </hgroup>
+  
+  <article data-timings="">
+    <p>Ta-dah!</p>
+
+<p><img src="assets/fig/unnamed-chunk-6-1.png" alt="plot of chunk unnamed-chunk-6"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+  
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Intro'>
+         1
+      </a>
+    </li>
+    
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Setup'>
+         2
+      </a>
+    </li>
+    
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Training'>
+         3
+      </a>
+    </li>
+    
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Plotting'>
+         4
+      </a>
+    </li>
+    
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='The Plot'>
+         5
+      </a>
+    </li>
+    
+    </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
