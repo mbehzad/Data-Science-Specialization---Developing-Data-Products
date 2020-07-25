@@ -2,6 +2,8 @@ library(shiny)
 library(ggplot2)
 library(caret)
 library(dplyr)
+library(klaR)
+library(randomForest)
 
 data(iris)
 
